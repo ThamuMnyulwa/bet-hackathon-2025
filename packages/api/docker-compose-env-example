@@ -1,3 +1,4 @@
+# Docker environment variables
 # Copy this file to .env and fill in your API key
 GOOGLE_GENAI_USE_VERTEXAI=FALSE
 GOOGLE_API_KEY=YOUR_API_KEY_HERE

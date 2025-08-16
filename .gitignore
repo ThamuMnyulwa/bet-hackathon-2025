@@ -137,6 +137,10 @@ terraform/*.tfstate
 terraform/*.tfstate.*
 terraform/**/*.tfstate
 terraform/**/*.tfstate.*
+terraform/terraform.tfstate.d/
+terraform/**/terraform.tfstate.d/
+terraform/*.tfstate.lock.info
+terraform/**/*.tfstate.lock.info
 
 # Crash logs
 terraform/crash.log
@@ -157,6 +161,8 @@ terraform/*_override.tf.json
 # Plan files
 terraform/*tfplan*
 terraform/**/*tfplan*
+terraform/*.plan
+terraform/**/*.plan
 
 # CLI config files
 terraform/.terraformrc
@@ -164,6 +170,7 @@ terraform/terraform.rc
 
 # Lock file (include in version control)
 # terraform/.terraform.lock.hcl
+!terraform/.terraform.lock.hcl
 
 # ========================================
 # Documentation
