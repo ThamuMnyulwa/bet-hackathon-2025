@@ -1,0 +1,15 @@
+{
+	"buildCommand": "npm run build",
+	"outputDirectory": ".next",
+	"framework": "nextjs",
+	"installCommand": "npm install",
+	"env": {
+		"DATABASE_URL": "@database_url",
+		"BETTER_AUTH_SECRET": "@better_auth_secret",
+		"BETTER_AUTH_URL": "@better_auth_url",
+		"GOOGLE_CLIENT_ID": "@google_client_id",
+		"GOOGLE_CLIENT_SECRET": "@google_client_secret",
+		"GROQ_API_KEY": "@groq_api_key",
+		"GOOGLE_AI_API_KEY": "@google_ai_api_key"
+	}
+}
