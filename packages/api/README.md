@@ -40,6 +40,60 @@ The system uses a single Risk Assessment Agent that orchestrates multiple specia
 
 The agent makes tool calls in parallel and the Final Risk Decision Tool combines the results using a weighted sum approach to determine the final fraud decision (approve, review, or block).
 
+## How It Works
+
+### Data Flow & Processing
+
+The fraud detection system operates through the following detailed process:
+
+1. **Transaction Input**: A financial transaction is submitted with user data including:
+   - Phone number
+   - Device information
+   - Location data
+   - Transaction details (amount, merchant, etc.)
+
+2. **TransUnion Data Enrichment**: 
+   - The Risk Assessment Agent calls TransUnion APIs to gather carrier intelligence
+   - Retrieves SIM swap history, device trust scores, and carrier switching patterns
+   - **Note**: In this implementation, we use mock data (`data/raw/transunion_*.csv`) that simulates the expected TransUnion response format
+
+3. **Parallel Tool Execution**: The agent simultaneously invokes three specialized tools:
+   - **SIM Intelligence Tool**: Analyzes recent SIM swaps, carrier changes, and suspicious patterns
+   - **Geographic Intelligence Tool**: Evaluates location anomalies, velocity checks, and geographic risk factors
+   - **Device Trust Tool**: Assesses device fingerprints, behavioral patterns, and device reputation
+
+4. **Risk Aggregation**: The Final Risk Decision Tool processes all tool outputs using a weighted algorithm:
+   - Each tool provides a risk score (0-100) and confidence level
+   - Weights are applied based on tool confidence and historical accuracy
+   - Final risk score determines the decision threshold
+
+5. **Decision Output**: Returns structured response with:
+   - Decision: APPROVE, REVIEW, or BLOCK
+   - Risk score and confidence level
+   - Detailed explanation with contributing factors
+   - Recommended actions for each decision type
+
+### TransUnion Integration
+
+The system integrates with TransUnion's fraud prevention services to access:
+
+- **SIM Swap Detection**: Real-time and historical SIM swap events
+- **Device Intelligence**: Device reputation and behavioral analytics
+- **Carrier Data**: Mobile network operator switching patterns
+- **Risk Indicators**: Aggregated fraud signals and scores
+
+**Mock Data Structure**: The simulated TransUnion responses include:
+```json
+{
+  "phone_number": "+1234567890",
+  "sim_swap_date": "2024-01-15",
+  "carrier": "Verizon",
+  "device_trust_score": 85,
+  "risk_indicators": ["recent_sim_swap", "device_change"],
+  "confidence": 0.92
+}
+```
+
 ## Implementation Details
 
 This implementation uses:
@@ -55,37 +109,117 @@ This implementation uses:
 
 - Python 3.13+
 - uv package manager
+- Google Cloud account (for Gemini API access)
+- Docker (for containerized deployment)
 
-### Installation
+### Local Development Setup
 
-Install dependencies using uv:
-
+1. **Clone and Navigate to Project**:
 ```bash
-uv pip install -e .
+git clone <repository-url>
+cd packages/api
 ```
 
-### Usage
-
-1. Run the client app to see the demo in action:
-
+2. **Environment Setup**:
 ```bash
-python client_app.py
+# Copy environment template
+cp .env-example .env
+
+# Edit .env file and add your Google API key
+# GOOGLE_API_KEY=your_actual_api_key_here
 ```
 
-2. Or test just the TransUnion connector:
-
+3. **Install Dependencies**:
 ```bash
-python transunion_connector.py
+# Install using uv (recommended)
+uv sync
+
+# This will install all dependencies from pyproject.toml and create uv.lock
 ```
 
-3. The system processes each transaction through the agent architecture and provides a fraud risk assessment with a decision (APPROVE, REVIEW, or BLOCK).
+4. **Run the API Server**:
+```bash
+# Use the development script (recommended)
+./scripts/dev.sh
+
+# Or run directly with uv
+uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# The API will be available at http://localhost:8000
+# API documentation at http://localhost:8000/docs
+```
+
+5. **Test the System**:
+```bash
+# Test the fraud risk engine agent directly
+uv run python test_agent_direct.py
+
+# Test TransUnion connector
+uv run python app/tools/transunion_connector.py
+
+# Test with sample transaction data
+uv run python -c "
+import json
+with open('test_transaction.json', 'r') as f:
+    print(json.load(f))
+"
+```
+
+### API Endpoints
+
+Once running locally, the following endpoints are available:
+
+- `GET /health` - Health check endpoint
+- `POST /fraud/analyze` - Main fraud detection endpoint
+- `GET /docs` - Interactive API documentation
+- `GET /redoc` - Alternative API documentation
+
+### Testing Fraud Detection
+
+Example API call to test fraud detection:
+
+```bash
+curl -X POST "http://localhost:8000/fraud/analyze" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "phone_number": "+1234567890",
+       "transaction_amount": 1500.00,
+       "merchant": "Online Store",
+       "location": {
+         "latitude": 40.7128,
+         "longitude": -74.0060
+       },
+       "device_id": "device123",
+       "user_id": "user456"
+     }'
+```
 
 ## Project Structure
 
-- `fraud_detection_agents.py` - Core implementation of the multi-agent architecture
-- `transunion_connector.py` - Integration with TransUnion for carrier data
-- `client_app.py` - Sample application using the fraud detection system
-- `data/raw/` - Sample TransUnion data for testing
+```
+packages/api/
+├── app/                          # FastAPI application
+│   ├── main.py                  # FastAPI app entry point
+│   ├── core/                    # Core configuration
+│   │   └── config.py           # Application settings
+│   ├── models/                  # Pydantic models
+│   │   └── schemas.py          # Request/response schemas
+│   ├── routes/                  # API route handlers
+│   │   ├── fraud.py            # Fraud detection endpoints
+│   │   └── health.py           # Health check endpoints
+│   ├── services/                # Business logic services
+│   └── tools/                   # Agent tools
+│       └── transunion_connector.py  # TransUnion API integration
+├── fraud_risk_engine/           # Main fraud detection agent
+│   └── agent.py                # ADK agent with integrated tools
+├── data/                        # Sample data for testing
+│   └── raw/                    # TransUnion mock data (CSV files)
+├── scripts/                     # Development scripts
+│   └── dev.sh                  # Development server startup
+├── pyproject.toml              # uv project configuration
+├── uv.lock                     # uv dependency lock file
+└── test_*.py                   # Test files
+```
 
 ## Example Transaction Flow
 
@@ -98,17 +232,105 @@ python transunion_connector.py
 
 ## Configuration
 
-The Risk Assessment Agent and its tools can be configured by modifying their instructions and model parameters in `fraud_detection_agents.py`.
+The Risk Assessment Agent and its tools can be configured by modifying:
+
+- **Agent Configuration**: `fraud_risk_engine/agent.py` - Main agent implementation with tool definitions
+- **API Configuration**: `app/core/config.py` - FastAPI and environment settings
+- **ADK Configuration**: `adk.yaml` - Google ADK agent configuration
+- **Dependencies**: `pyproject.toml` - Project dependencies managed by uv
+
+## Cloud Deployment (Google Cloud Run)
+
+The fraud detection system is designed to run as a containerized service on Google Cloud Run, providing auto-scaling and serverless deployment.
+
+### Deployment Architecture
+
+```
+Client Application → Cloud Run Service → Gemini API
+                                    ↓
+                              TransUnion APIs
+```
+
+### Cloud Run Configuration
+
+1. **Dockerfile Setup**:
+```dockerfile
+FROM python:3.13-slim
+
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+
+WORKDIR /app
+
+# Copy uv configuration files
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies
+RUN uv sync --frozen
+
+# Copy application code
+COPY . .
+
+# Expose port
+EXPOSE 8080
+
+# Run the application
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+```
+
+2. **Environment Variables for Cloud Run**:
+```bash
+GOOGLE_API_KEY=your_production_api_key
+GOOGLE_GENAI_USE_VERTEXAI=TRUE  # Use Vertex AI in production
+PORT=8080
+ENVIRONMENT=production
+```
+
+3. **Deploy to Cloud Run**:
+```bash
+# Build and deploy
+gcloud run deploy fraud-detection-api \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars GOOGLE_API_KEY=$GOOGLE_API_KEY \
+  --memory 2Gi \
+  --cpu 2 \
+  --max-instances 10 \
+  --min-instances 1
+```
+
+### Auto-scaling Configuration
+
+The Cloud Run service automatically scales based on:
+- **Request concurrency**: Up to 1000 concurrent requests per instance
+- **CPU utilization**: Scales up when CPU > 60%
+- **Memory usage**: Scales up when memory > 70%
+- **Cold start optimization**: Minimum 1 instance to reduce latency
+
+### Production Considerations
+
+- **Authentication**: Implement API key authentication for production access
+- **Rate Limiting**: Configure rate limits to prevent abuse
+- **Monitoring**: Set up Cloud Monitoring for performance tracking
+- **Logging**: Structured logging with Cloud Logging integration
+- **Health Checks**: Configured health check endpoint for service monitoring
 
 ## Advanced Usage
 
 For production deployments, consider:
 
-1. Replacing the sample TransUnion data with real API integration
-2. Implementing caching for API responses
-3. Adding monitoring and observability
-4. Fine-tuning agent instructions for your specific use case
-5. Implementing fallback mechanisms for robustness
+1. **Real TransUnion Integration**: Replace mock data with actual TransUnion API calls
+2. **Caching Layer**: Implement Redis caching for API responses and repeated queries
+3. **Monitoring & Observability**: 
+   - Cloud Monitoring for performance metrics
+   - Error tracking with Cloud Error Reporting
+   - Distributed tracing for request flow analysis
+4. **Agent Fine-tuning**: Customize agent instructions based on your specific fraud patterns
+5. **Fallback Mechanisms**: Implement circuit breakers and retry logic for external API calls
+6. **Data Pipeline**: Set up batch processing for model training and validation
+7. **A/B Testing**: Deploy multiple agent configurations for performance comparison
 
 
 
