@@ -1,0 +1,23 @@
+name: "fraud-detection-system"
+description: "SIM-Swap Aware Fraud Detection System using multi-agent architecture"
+
+agents:
+  - agent_path: "app.agents.fraud_detection_agent.fraud_detection_agent"
+    description: "Main fraud detection orchestrator agent"
+    name: "FraudDetectionAgent"
+  
+  - agent_path: "app.agents.sim_intel_agent.sim_intelligence_agent"
+    description: "SIM Intelligence specialist agent"
+    name: "SIMIntelligenceAgent"
+    
+  - agent_path: "app.agents.geographic_intelligence_agent.geographic_intelligence_agent"
+    description: "Geographic Intelligence specialist agent"
+    name: "GeographicIntelligenceAgent"
+    
+  - agent_path: "app.agents.device_trust_agent.device_trust_agent"
+    description: "Device Trust specialist agent"
+    name: "DeviceTrustAgent"
+    
+  - agent_path: "app.agents.real_time_context_agent.real_time_context_agent"
+    description: "Real-Time Context synthesis agent"
+    name: "RealTimeContextAgent"

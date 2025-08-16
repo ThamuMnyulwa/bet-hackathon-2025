@@ -1,0 +1,276 @@
+# ========================================
+# Monorepo Root Level Exclusions
+# ========================================
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.AppleDouble
+.LSOverride
+
+# IDE Files
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+,
+*.tmp
+*.temp
+*.log
+logs/
+
+# ========================================
+# Backend (FastAPI) - packages/api/
+# ========================================
+
+# Python
+packages/api/__pycache__/
+packages/api/**/__pycache__/
+packages/api/*.py[cod]
+packages/api/**/*.py[cod]
+packages/api/*$py.class
+
+# Virtual environments
+packages/api/.venv/
+packages/api/venv/
+packages/api/env/
+packages/api/.env
+
+# Environment files
+packages/api/.env
+packages/api/.env.*
+!packages/api/.env.example
+
+# Distribution / packaging
+packages/api/.Python
+packages/api/build/
+packages/api/dist/
+packages/api/*.egg-info/
+packages/api/*.egg
+
+# Testing
+packages/api/.coverage
+packages/api/.pytest_cache/
+packages/api/htmlcov/
+packages/api/.hypothesis/
+
+# Jupyter
+packages/api/.ipynb_checkpoints
+packages/api/**/.ipynb_checkpoints
+
+# Database
+packages/api/*.db
+packages/api/*.sqlite
+packages/api/*.sqlite3
+
+# MyPy
+packages/api/.mypy_cache/
+packages/api/.dmypy.json
+packages/api/dmypy.json
+
+# uv package manager
+packages/api/uv.lock
+
+# Project specific
+packages/api/data/raw/*.csv
+!packages/api/data/raw/transunion_test.csv
+!packages/api/data/raw/transunion_train.csv
+
+# ========================================
+# Frontend - apps/web/
+# ========================================
+
+# Node modules
+apps/web/node_modules/
+apps/web/.pnpm-store/
+
+# Build outputs
+apps/web/dist/
+apps/web/build/
+apps/web/.next/
+apps/web/out/
+
+# Environment files
+apps/web/.env
+apps/web/.env.*
+!apps/web/.env.example
+
+# Logs
+apps/web/npm-debug.log*
+apps/web/yarn-debug.log*
+apps/web/yarn-error.log*
+apps/web/pnpm-debug.log*
+
+# Testing
+apps/web/coverage/
+apps/web/.nyc_output/
+
+# Cache
+apps/web/.cache/
+apps/web/.parcel-cache/
+apps/web/.turbo/
+
+# TypeScript
+apps/web/*.tsbuildinfo
+
+# Package manager files
+apps/web/yarn.lock
+apps/web/package-lock.json
+apps/web/pnpm-lock.yaml
+
+# ========================================
+# Terraform - terraform/
+# ========================================
+
+# Terraform directories
+terraform/.terraform/
+terraform/**/.terraform/
+
+# Terraform state files
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/**/*.tfstate
+terraform/**/*.tfstate.*
+
+# Crash logs
+terraform/crash.log
+terraform/crash.*.log
+
+# Sensitive variable files
+terraform/*.tfvars
+terraform/*.tfvars.json
+terraform/**/*.tfvars
+terraform/**/*.tfvars.json
+
+# Override files
+terraform/override.tf
+terraform/override.tf.json
+terraform/*_override.tf
+terraform/*_override.tf.json
+
+# Plan files
+terraform/*tfplan*
+terraform/**/*tfplan*
+
+# CLI config files
+terraform/.terraformrc
+terraform/terraform.rc
+
+# Lock file (include in version control)
+# terraform/.terraform.lock.hcl
+
+# ========================================
+# Documentation
+# ========================================
+
+# Generated docs
+docs/generated/
+docs/build/
+docs/.docusaurus/
+
+# ========================================
+# Security & Credentials
+# ========================================
+
+# Private keys and certificates
+*.pem
+*.key
+*.crt
+*.cer
+*.pfx
+*.p12
+
+# Service account keys
+*service-account*.json
+*credentials*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!jsconfig.json
+!test_transaction.json
+
+# AWS
+.aws/
+
+# Google Cloud
+.gcloud/
+gcloud-*.json
+
+# API keys
+api_keys.txt
+secrets.txt
+.secrets/
+
+# ========================================
+# Build & Deploy
+# ========================================
+
+# Docker
+docker-compose.override.yml
+.dockerignore.local
+
+# CI/CD
+.github/workflows/local/
+.gitlab/local/
+
+# Deployment scripts with credentials
+deploy_prod.sh
+deploy_staging.sh
+*_deploy_*.sh
+
+# ========================================
+# Data & Backups
+# ========================================
+
+# Database dumps
+*.sql
+*.dump
+*.bak
+*.backup
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Large files
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# ========================================
+# Miscellaneous
+# ========================================
+
+# Core dumps
+core
+core.*
+
+# Performance profiling
+*.prof
+*.stats
+
+# Debug
+debug/
+*.debug
+
+# Session files
+Session.vim
+*.session
+
+# Tag files
+tags
+TAGS
+.tags
+
+# Vagrant
+.vagrant/

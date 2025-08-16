@@ -1,0 +1,15 @@
+{
+  "transaction_id": "tx_12345",
+  "msisdn": "27731234567", 
+  "device_id": "DEV123456789",
+  "amount": 1500.00,
+  "merchant": "Electronics Store",
+  "timestamp": "2025-08-16T12:00:00Z",
+  "location": {
+    "country": "ZA",
+    "city": "Cape Town",
+    "latitude": -33.9249,
+    "longitude": 18.4241
+  },
+  "ip_address": "196.25.1.100"
+}
